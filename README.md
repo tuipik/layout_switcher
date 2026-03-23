@@ -48,6 +48,21 @@ Remove the user installation:
 ./scripts/uninstall_user.sh
 ```
 
+Quick bootstrap:
+```bash
+./scripts/bootstrap.sh
+```
+
+Or explicitly:
+```bash
+./scripts/bootstrap_arch.sh
+```
+
+or on Ubuntu:
+```bash
+./scripts/bootstrap_ubuntu.sh
+```
+
 ## System Setup
 This project expects three system-side pieces to be in place:
 - access to `/dev/input` for reading keyboard events
@@ -65,6 +80,7 @@ Ubuntu note:
 - package names and availability differ
 - `wl-clipboard` and `python3-evdev` are straightforward
 - `ydotool` and `keyd` may require distro-specific packages or manual install depending on Ubuntu release
+- this repo includes `bootstrap_ubuntu.sh`, which falls back to `F8` / `Shift+F8` if `keyd` is unavailable
 
 Allow your user to read keyboard events:
 ```bash
@@ -219,5 +235,7 @@ After setup:
 - Browser/editor hotkeys do nothing: verify `wl-copy`, `wl-paste`, and `ydotool` are installed and available in `PATH`.
 - App detection does not ignore terminals: set the full path to `hyprctl` in `config.json`, for example `"/usr/bin/hyprctl"` if that is where it is installed on your system.
 - For a one-command bootstrap of the user-side pieces, run `./scripts/install_user.sh`.
+- For automatic distro detection, run `./scripts/bootstrap.sh`.
+- For distro-specific bootstrap, run `./scripts/bootstrap_arch.sh` or `./scripts/bootstrap_ubuntu.sh`.
 - To remove the user installation, run `./scripts/uninstall_user.sh`.
 - To check the current machine state, run `layout-switcher doctor`.

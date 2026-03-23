@@ -7,6 +7,7 @@ Ubuntu note:
 - package names differ
 - the current terminal-ignore detection is Hyprland-specific because it uses `hyprctl`
 - browser/editor conversion can still work on Ubuntu, but Hyprland-specific behavior will not
+- if `keyd` is unavailable, use `./scripts/bootstrap_ubuntu.sh`, which switches to `F8` / `Shift+F8`
 
 ## 1. Install packages
 ```bash
@@ -135,6 +136,13 @@ layout-switcher doctor
 There is also a helper script that installs the Python package, copies the default user config, and installs the user services:
 ```bash
 ./scripts/install_user.sh
+```
+
+For a distro-specific automated setup:
+```bash
+./scripts/bootstrap.sh
+./scripts/bootstrap_arch.sh
+./scripts/bootstrap_ubuntu.sh
 ```
 
 To remove the user-side installation later:
