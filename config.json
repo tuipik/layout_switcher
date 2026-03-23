@@ -1,0 +1,57 @@
+{
+  "hotkeys": {
+    "buffer_mode": "F24",
+    "selection_mode": "SHIFT+F24"
+  },
+  "language": {
+    "primary": "en",
+    "secondary": "uk"
+  },
+  "capture_layout": "en",
+  "selection_auto_detect": true,
+  "buffer_auto_detect": true,
+  "input": {
+    "device_path": null,
+    "device_name": null,
+    "grab_device": false
+  },
+  "ignored_apps": [
+    "Alacritty",
+    "steam",
+    "Steam"
+  ],
+  "terminal_apps": [
+    "Alacritty",
+    "kitty",
+    "foot",
+    "wezterm",
+    "Konsole",
+    "Yakuake",
+    "gnome-terminal",
+    "terminator"
+  ],
+  "notifications": {
+    "enable": true,
+    "use_hyprctl": true,
+    "fallback_notify_send": true
+  },
+  "executor": {
+    "ydotool": "/usr/bin/ydotool",
+    "wl_copy": "wl-copy",
+    "wl_paste": "wl-paste",
+    "hyprctl": "hyprctl",
+    "notify_send": "notify-send",
+    "type_delay_ms": 0,
+    "combo_delay_ms": 2,
+    "clipboard_capture_timeout_ms": 350,
+    "clipboard_capture_poll_ms": 25,
+    "restore_clipboard_after_paste": false,
+    "clipboard_restore_delay_ms": 250,
+    "buffer_select_combo": "CTRL+SHIFT+LEFT",
+    "clipboard_copy_combo": "CTRL+C",
+    "clipboard_paste_combo": "CTRL+V"
+  },
+  "logging": {
+    "level": "DEBUG"
+  }
+}
