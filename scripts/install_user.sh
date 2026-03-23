@@ -7,6 +7,8 @@ SYSTEMD_DIR="${HOME}/.config/systemd/user"
 APP_DIR="${HOME}/.local/share/layout-switcher"
 VENV_DIR="${APP_DIR}/venv"
 BIN_DIR="${HOME}/.local/bin"
+SHELL_NAME="$(basename "${SHELL:-}")"
+PATH_SNIPPET='export PATH="$HOME/.local/bin:$PATH"'
 
 echo "[1/5] Installing Python package"
 mkdir -p "${APP_DIR}"
@@ -28,9 +30,16 @@ cat > "${BIN_DIR}/layout-switcher" <<EOF
 exec "${VENV_DIR}/bin/layout-switcher" "\$@"
 EOF
 chmod +x "${BIN_DIR}/layout-switcher"
-
-if ! grep -qs 'HOME/.local/bin' "${HOME}/.zprofile" 2>/dev/null && ! grep -qs 'HOME/.local/bin' "${HOME}/.profile" 2>/dev/null; then
-  echo 'export PATH="$HOME/.local/bin:$PATH"' >> "${HOME}/.zprofile"
+if [[ "${SHELL_NAME}" == "zsh" ]]; then
+  SHELL_RC="${HOME}/.zshrc"
+elif [[ "${SHELL_NAME}" == "bash" ]]; then
+  SHELL_RC="${HOME}/.bashrc"
+else
+  SHELL_RC="${HOME}/.profile"
+fi
+touch "${SHELL_RC}"
+if ! grep -Fqs "${PATH_SNIPPET}" "${SHELL_RC}"; then
+  printf '\n%s\n' "${PATH_SNIPPET}" >> "${SHELL_RC}"
 fi
 
 echo "[3/5] Installing systemd user services"
@@ -65,4 +74,6 @@ cat <<'EOF'
    layout-switcher doctor
    If it appears to hang, try:
    timeout 10s layout-switcher doctor
+7. If the command is still not found, reload your shell rc:
+   source ~/.zshrc
 EOF

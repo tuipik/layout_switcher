@@ -118,7 +118,7 @@ layout-switcher
 
 If `zsh` does not see the command yet:
 ```bash
-source ~/.zprofile
+source ~/.zshrc
 ```
 
 Expected startup log:
