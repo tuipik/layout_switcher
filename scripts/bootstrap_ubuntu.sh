@@ -5,10 +5,13 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIG_DIR="${HOME}/.config/layout-switcher"
 SYSTEMD_DIR="${HOME}/.config/systemd/user"
 CONFIG_PATH="${CONFIG_DIR}/config.json"
+APP_DIR="${HOME}/.local/share/layout-switcher"
+VENV_DIR="${APP_DIR}/venv"
+BIN_DIR="${HOME}/.local/bin"
 
 echo "[1/8] Installing Ubuntu packages"
 sudo apt update
-sudo apt install -y python3 python3-pip python3-evdev wl-clipboard ydotool ydotoold
+sudo apt install -y python3 python3-pip python3-venv python3-evdev wl-clipboard ydotool ydotoold
 
 echo "[2/8] Ensuring input access"
 sudo usermod -aG input "${USER}"
@@ -16,13 +19,18 @@ sudo modprobe uinput
 echo uinput | sudo tee /etc/modules-load.d/uinput.conf >/dev/null
 
 echo "[3/8] Installing Python package"
-python3 -m pip install --user "${PROJECT_ROOT}"
+mkdir -p "${APP_DIR}"
+python3 -m venv "${VENV_DIR}"
+"${VENV_DIR}/bin/python" -m pip install --upgrade pip
+"${VENV_DIR}/bin/python" -m pip install "${PROJECT_ROOT}"
 
 echo "[4/8] Installing user config"
 mkdir -p "${CONFIG_DIR}"
+mkdir -p "${BIN_DIR}"
 if [[ ! -f "${CONFIG_PATH}" ]]; then
   cp "${PROJECT_ROOT}/layout_switcher/default_config.json" "${CONFIG_PATH}"
 fi
+ln -sf "${VENV_DIR}/bin/layout-switcher" "${BIN_DIR}/layout-switcher"
 
 echo "[5/8] Configuring hotkeys"
 if apt-cache show keyd >/dev/null 2>&1; then
@@ -59,7 +67,7 @@ systemctl --user enable --now layout-switcher.service
 
 echo "[8/8] Running diagnostics"
 export YDTOOL_SOCKET="/run/user/$(id -u)/.ydotool_socket"
-"${HOME}/.local/bin/layout-switcher" doctor || true
+"${VENV_DIR}/bin/layout-switcher" doctor || true
 
 cat <<'EOF'
 

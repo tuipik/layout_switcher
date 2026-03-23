@@ -4,18 +4,26 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIG_DIR="${HOME}/.config/layout-switcher"
 SYSTEMD_DIR="${HOME}/.config/systemd/user"
+APP_DIR="${HOME}/.local/share/layout-switcher"
+VENV_DIR="${APP_DIR}/venv"
+BIN_DIR="${HOME}/.local/bin"
 
 echo "[1/5] Installing Python package"
-python -m pip install --user "${PROJECT_ROOT}"
+mkdir -p "${APP_DIR}"
+python3 -m venv "${VENV_DIR}"
+"${VENV_DIR}/bin/python" -m pip install --upgrade pip
+"${VENV_DIR}/bin/python" -m pip install "${PROJECT_ROOT}"
 
 echo "[2/5] Creating user config directory"
 mkdir -p "${CONFIG_DIR}"
+mkdir -p "${BIN_DIR}"
 if [[ ! -f "${CONFIG_DIR}/config.json" ]]; then
   cp "${PROJECT_ROOT}/layout_switcher/default_config.json" "${CONFIG_DIR}/config.json"
   echo "Created ${CONFIG_DIR}/config.json"
 else
   echo "Keeping existing ${CONFIG_DIR}/config.json"
 fi
+ln -sf "${VENV_DIR}/bin/layout-switcher" "${BIN_DIR}/layout-switcher"
 
 echo "[3/5] Installing systemd user services"
 mkdir -p "${SYSTEMD_DIR}"

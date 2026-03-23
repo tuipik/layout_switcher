@@ -5,6 +5,9 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIG_DIR="${HOME}/.config/layout-switcher"
 SYSTEMD_DIR="${HOME}/.config/systemd/user"
 CONFIG_PATH="${CONFIG_DIR}/config.json"
+APP_DIR="${HOME}/.local/share/layout-switcher"
+VENV_DIR="${APP_DIR}/venv"
+BIN_DIR="${HOME}/.local/bin"
 
 echo "[1/7] Installing Arch/Manjaro packages"
 sudo pacman -S --needed python python-pip python-evdev ydotool wl-clipboard keyd
@@ -15,13 +18,18 @@ sudo modprobe uinput
 echo uinput | sudo tee /etc/modules-load.d/uinput.conf >/dev/null
 
 echo "[3/7] Installing Python package"
-python -m pip install --user "${PROJECT_ROOT}"
+mkdir -p "${APP_DIR}"
+python -m venv "${VENV_DIR}"
+"${VENV_DIR}/bin/python" -m pip install --upgrade pip
+"${VENV_DIR}/bin/python" -m pip install "${PROJECT_ROOT}"
 
 echo "[4/7] Installing user config"
 mkdir -p "${CONFIG_DIR}"
+mkdir -p "${BIN_DIR}"
 if [[ ! -f "${CONFIG_PATH}" ]]; then
   cp "${PROJECT_ROOT}/layout_switcher/default_config.json" "${CONFIG_PATH}"
 fi
+ln -sf "${VENV_DIR}/bin/layout-switcher" "${BIN_DIR}/layout-switcher"
 
 echo "[5/7] Installing keyd remap"
 sudo cp "${PROJECT_ROOT}/keyd/layout-switcher.conf" /etc/keyd/default.conf
@@ -38,7 +46,7 @@ systemctl --user enable --now layout-switcher.service
 
 echo "[7/7] Running diagnostics"
 export YDTOOL_SOCKET="/run/user/$(id -u)/.ydotool_socket"
-"${HOME}/.local/bin/layout-switcher" doctor || true
+"${VENV_DIR}/bin/layout-switcher" doctor || true
 
 cat <<'EOF'
 

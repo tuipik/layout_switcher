@@ -38,9 +38,10 @@ From the project directory:
 pip install -r requirements.txt
 ```
 
-Optional: install the app as a user package:
+Optional: install the app into its own user venv:
 ```bash
-python -m pip install --user .
+python3 -m venv ~/.local/share/layout-switcher/venv
+~/.local/share/layout-switcher/venv/bin/python -m pip install .
 ```
 
 ## 4. Install the keyd remap
@@ -109,7 +110,7 @@ export YDTOOL_SOCKET=/run/user/$(id -u)/.ydotool_socket
 python main.py --config config.json
 ```
 
-If you installed the package with `pip --user`, you can also run:
+If you installed the app into its user venv, you can also run:
 ```bash
 layout-switcher doctor
 layout-switcher

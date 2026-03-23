@@ -33,9 +33,10 @@ Install Python deps:
 pip install -r requirements.txt
 ```
 
-Or install the app as a user package:
+Or install the app into its own user venv:
 ```bash
-python -m pip install --user .
+python3 -m venv ~/.local/share/layout-switcher/venv
+~/.local/share/layout-switcher/venv/bin/python -m pip install .
 ```
 
 Run a local readiness check:
@@ -199,7 +200,7 @@ export YDTOOL_SOCKET=/run/user/$(id -u)/.ydotool_socket
 python main.py --config config.json
 ```
 
-Or, after `python -m pip install --user .`:
+Or, after installing into the app venv:
 ```bash
 export YDTOOL_SOCKET=/run/user/$(id -u)/.ydotool_socket
 layout-switcher
@@ -238,4 +239,5 @@ After setup:
 - For automatic distro detection, run `./scripts/bootstrap.sh`.
 - For distro-specific bootstrap, run `./scripts/bootstrap_arch.sh` or `./scripts/bootstrap_ubuntu.sh`.
 - To remove the user installation, run `./scripts/uninstall_user.sh`.
+- The install scripts also create `~/.local/bin/layout-switcher` as a convenience wrapper.
 - To check the current machine state, run `layout-switcher doctor`.
