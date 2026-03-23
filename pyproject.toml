@@ -18,5 +18,8 @@ layout-switcher = "layout_switcher.cli:main"
 [tool.setuptools]
 include-package-data = true
 
+[tool.setuptools.packages.find]
+include = ["layout_switcher"]
+
 [tool.setuptools.package-data]
 layout_switcher = ["default_config.json"]
