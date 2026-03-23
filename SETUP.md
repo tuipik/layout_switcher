@@ -116,6 +116,11 @@ layout-switcher doctor
 layout-switcher
 ```
 
+If `zsh` does not see the command yet:
+```bash
+source ~/.zprofile
+```
+
 Expected startup log:
 ```text
 Listening on input device: ... (keyd virtual keyboard)

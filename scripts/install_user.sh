@@ -23,7 +23,15 @@ if [[ ! -f "${CONFIG_DIR}/config.json" ]]; then
 else
   echo "Keeping existing ${CONFIG_DIR}/config.json"
 fi
-ln -sf "${VENV_DIR}/bin/layout-switcher" "${BIN_DIR}/layout-switcher"
+cat > "${BIN_DIR}/layout-switcher" <<EOF
+#!/usr/bin/env bash
+exec "${VENV_DIR}/bin/layout-switcher" "\$@"
+EOF
+chmod +x "${BIN_DIR}/layout-switcher"
+
+if ! grep -qs 'HOME/.local/bin' "${HOME}/.zprofile" 2>/dev/null && ! grep -qs 'HOME/.local/bin' "${HOME}/.profile" 2>/dev/null; then
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> "${HOME}/.zprofile"
+fi
 
 echo "[3/5] Installing systemd user services"
 mkdir -p "${SYSTEMD_DIR}"

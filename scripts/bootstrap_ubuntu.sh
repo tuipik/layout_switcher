@@ -30,7 +30,15 @@ mkdir -p "${BIN_DIR}"
 if [[ ! -f "${CONFIG_PATH}" ]]; then
   cp "${PROJECT_ROOT}/layout_switcher/default_config.json" "${CONFIG_PATH}"
 fi
-ln -sf "${VENV_DIR}/bin/layout-switcher" "${BIN_DIR}/layout-switcher"
+cat > "${BIN_DIR}/layout-switcher" <<EOF
+#!/usr/bin/env bash
+exec "${VENV_DIR}/bin/layout-switcher" "\$@"
+EOF
+chmod +x "${BIN_DIR}/layout-switcher"
+
+if ! grep -qs 'HOME/.local/bin' "${HOME}/.zprofile" 2>/dev/null && ! grep -qs 'HOME/.local/bin' "${HOME}/.profile" 2>/dev/null; then
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> "${HOME}/.zprofile"
+fi
 
 echo "[5/8] Configuring hotkeys"
 if apt-cache show keyd >/dev/null 2>&1; then
@@ -79,4 +87,6 @@ Important:
    layout-switcher doctor
 3. On Ubuntu without keyd, the fallback hotkeys are:
    F8 / Shift+F8
+4. If the shell still does not see the command, run:
+   source ~/.zprofile
 EOF

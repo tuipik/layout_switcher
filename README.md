@@ -240,4 +240,5 @@ After setup:
 - For distro-specific bootstrap, run `./scripts/bootstrap_arch.sh` or `./scripts/bootstrap_ubuntu.sh`.
 - To remove the user installation, run `./scripts/uninstall_user.sh`.
 - The install scripts also create `~/.local/bin/layout-switcher` as a convenience wrapper.
+- If `layout-switcher` is not found in `zsh`, run `source ~/.zprofile` or log in again so `~/.local/bin` is picked up.
 - To check the current machine state, run `layout-switcher doctor`.
