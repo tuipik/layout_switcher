@@ -108,9 +108,12 @@ def _check_user_service(name: str, required: bool) -> CheckResult:
             capture_output=True,
             text=True,
             check=False,
+            timeout=3,
         )
     except OSError as exc:
         return CheckResult(name, False, f"failed to query service: {exc}", required=required)
+    except subprocess.TimeoutExpired:
+        return CheckResult(name, False, "timed out while querying service", required=required)
     state = (result.stdout or result.stderr).strip() or "unknown"
     return CheckResult(name, result.returncode == 0 and state == "active", state, required=required)
 

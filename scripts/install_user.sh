@@ -63,4 +63,6 @@ cat <<'EOF'
 
 6. Run a quick diagnostic:
    layout-switcher doctor
+   If it appears to hang, try:
+   timeout 10s layout-switcher doctor
 EOF

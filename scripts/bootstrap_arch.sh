@@ -54,7 +54,11 @@ systemctl --user enable --now layout-switcher.service
 
 echo "[7/7] Running diagnostics"
 export YDTOOL_SOCKET="/run/user/$(id -u)/.ydotool_socket"
-"${VENV_DIR}/bin/layout-switcher" doctor || true
+if command -v timeout >/dev/null 2>&1; then
+  timeout 10s "${VENV_DIR}/bin/layout-switcher" doctor || true
+else
+  "${VENV_DIR}/bin/layout-switcher" doctor || true
+fi
 
 cat <<'EOF'
 
