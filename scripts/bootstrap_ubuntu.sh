@@ -56,6 +56,18 @@ if apt-cache show keyd >/dev/null 2>&1; then
   sudo cp "${PROJECT_ROOT}/keyd/layout-switcher.conf" /etc/keyd/default.conf
   sudo systemctl enable --now keyd
   sudo keyd reload
+  python3 - "$CONFIG_PATH" <<'PY'
+import json, sys
+path = sys.argv[1]
+with open(path, encoding="utf-8") as f:
+    data = json.load(f)
+data.setdefault("hotkeys", {})
+data["hotkeys"]["buffer_mode"] = "F24"
+data["hotkeys"]["selection_mode"] = "SHIFT+F24"
+with open(path, "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+    f.write("\n")
+PY
 else
   echo "keyd package not found in apt; switching config to F8 / Shift+F8 fallback"
   python3 - "$CONFIG_PATH" <<'PY'

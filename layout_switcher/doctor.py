@@ -5,6 +5,7 @@ import os
 import pwd
 import shutil
 import subprocess
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -23,26 +24,30 @@ class CheckResult:
 
 
 def run_doctor() -> int:
-    results = [
-        _check_config(),
-        _check_binary("ydotool", required=True),
-        _check_binary("wl-copy", required=True),
-        _check_binary("wl-paste", required=True),
-        _check_binary("keyd", required=False),
-        _check_binary("hyprctl", required=False),
-        _check_input_group(),
-        _check_uinput(),
-        _check_ydotool_socket(),
-        _check_keyd_virtual_keyboard(),
-        _check_user_service("ydotoold.service", required=False),
-        _check_user_service("layout-switcher.service", required=False),
-    ]
-
     print("layout-switcher doctor")
     print()
-    for item in results:
-        status = "OK" if item.ok else ("WARN" if not item.required else "FAIL")
-        print(f"[{status}] {item.name}: {item.detail}")
+    checks = [
+        ("config", _check_config),
+        ("ydotool", lambda: _check_binary("ydotool", required=True)),
+        ("wl-copy", lambda: _check_binary("wl-copy", required=True)),
+        ("wl-paste", lambda: _check_binary("wl-paste", required=True)),
+        ("keyd", lambda: _check_binary("keyd", required=False)),
+        ("hyprctl", lambda: _check_binary("hyprctl", required=False)),
+        ("input group", _check_input_group),
+        ("uinput", _check_uinput),
+        ("ydotool socket", _check_ydotool_socket),
+        ("keyd virtual keyboard", _check_keyd_virtual_keyboard),
+        ("ydotoold.service", lambda: _check_user_service("ydotoold.service", required=False)),
+        ("layout-switcher.service", lambda: _check_user_service("layout-switcher.service", required=False)),
+    ]
+
+    results: list[CheckResult] = []
+    for name, check in checks:
+        print(f"Checking {name}...", flush=True)
+        result = check()
+        results.append(result)
+        status = "OK" if result.ok else ("WARN" if not result.required else "FAIL")
+        print(f"[{status}] {result.name}: {result.detail}", flush=True)
 
     failures = [item for item in results if item.required and not item.ok]
     return 1 if failures else 0
@@ -90,9 +95,13 @@ def _check_ydotool_socket() -> CheckResult:
 
 def _check_keyd_virtual_keyboard() -> CheckResult:
     try:
-        names = [(InputDevice(path).name or "") for path in list_devices()]
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(_list_input_device_names)
+            names = future.result(timeout=3)
+    except FutureTimeout:
+        return CheckResult("keyd virtual keyboard", False, "timed out while enumerating input devices", required=False)
     except OSError as exc:
-        return CheckResult("keyd virtual keyboard", False, f"failed to enumerate input devices: {exc}")
+        return CheckResult("keyd virtual keyboard", False, f"failed to enumerate input devices: {exc}", required=False)
     ok = any("keyd virtual keyboard" in name.lower() for name in names)
     detail = "device found" if ok else "device not found"
     return CheckResult("keyd virtual keyboard", ok, detail, required=False)
@@ -123,3 +132,7 @@ def _current_username() -> str | None:
         return pwd.getpwuid(os.getuid()).pw_name
     except KeyError:
         return None
+
+
+def _list_input_device_names() -> list[str]:
+    return [(InputDevice(path).name or "") for path in list_devices()]
