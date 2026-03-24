@@ -40,6 +40,10 @@ def main() -> None:
     listener = InputListener(config.input, processor.handle_key_event)
 
     listener.start()
+    if not listener.wait_until_started(3.0):
+        listener.stop()
+        message = listener.start_error or "Input listener did not start"
+        raise SystemExit(message)
     try:
         while listener.is_alive():
             time.sleep(1)

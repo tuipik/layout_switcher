@@ -20,6 +20,8 @@ class InputListener(threading.Thread):
         self._callback = callback
         self._stop_event = threading.Event()
         self._devices: List[InputDevice] = []
+        self._started_ok = threading.Event()
+        self._start_error: Optional[str] = None
 
     def stop(self) -> None:
         self._stop_event.set()
@@ -37,6 +39,7 @@ class InputListener(threading.Thread):
         try:
             self._devices = self._open_devices()
         except Exception as exc:
+            self._start_error = str(exc)
             logger.error("Input listener failed to start: %s", exc)
             return
 
@@ -50,6 +53,7 @@ class InputListener(threading.Thread):
 
         for device in self._devices:
             logger.info("Listening on input device: %s (%s)", device.path, device.name)
+        self._started_ok.set()
 
         while not self._stop_event.is_set():
             try:
@@ -68,6 +72,15 @@ class InputListener(threading.Thread):
             except OSError as exc:
                 logger.error("Input device read error: %s", exc)
                 break
+
+    def wait_until_started(self, timeout: float = 3.0) -> bool:
+        if self._started_ok.wait(timeout):
+            return True
+        return False
+
+    @property
+    def start_error(self) -> Optional[str]:
+        return self._start_error
 
     def _open_devices(self) -> List[InputDevice]:
         if self._input_cfg.device_path:
