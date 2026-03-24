@@ -86,16 +86,19 @@ fi
 
 echo "[6/8] Installing user services"
 mkdir -p "${SYSTEMD_DIR}"
-cp "${PROJECT_ROOT}/systemd/ydotoold.service" "${SYSTEMD_DIR}/ydotoold.service"
-cp "${PROJECT_ROOT}/systemd/layout-switcher.service" "${SYSTEMD_DIR}/layout-switcher.service"
+cp "${PROJECT_ROOT}/systemd/layout-switcher-ubuntu.service" "${SYSTEMD_DIR}/layout-switcher.service"
 
-echo "[7/8] Enabling user services"
+echo "[7/8] Installing root ydotoold service"
+sudo cp "${PROJECT_ROOT}/systemd/ydotoold-root.service" /etc/systemd/system/ydotoold-root.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now ydotoold-root.service
+
+echo "[8/8] Enabling user services"
 systemctl --user daemon-reload
-systemctl --user enable --now ydotoold.service
 systemctl --user enable --now layout-switcher.service
 
-echo "[8/8] Running diagnostics"
-export YDTOOL_SOCKET="/run/user/$(id -u)/.ydotool_socket"
+echo "[9/9] Running diagnostics"
+export YDTOOL_SOCKET="/tmp/.ydotool_socket"
 if command -v timeout >/dev/null 2>&1; then
   timeout 10s "${VENV_DIR}/bin/layout-switcher" doctor || true
 else
@@ -114,4 +117,6 @@ Important:
    F8 / Shift+F8
 4. If the shell still does not see the command, run:
    source ~/.zshrc
+5. Ubuntu uses a root ydotoold service and the socket:
+   /tmp/.ydotool_socket
 EOF

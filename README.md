@@ -87,6 +87,7 @@ Ubuntu note:
 - `wl-clipboard` and `python3-evdev` are straightforward
 - `ydotool` and `keyd` may require distro-specific packages or manual install depending on Ubuntu release
 - this repo includes `bootstrap_ubuntu.sh`, which falls back to `F8` / `Shift+F8` if `keyd` is unavailable
+- on Ubuntu, this repo uses a root `ydotoold` service with `/tmp/.ydotool_socket`, because user-mode `ydotoold` may fail to open `uinput`
 
 Allow your user to read keyboard events:
 ```bash

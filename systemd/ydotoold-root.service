@@ -1,0 +1,14 @@
+[Unit]
+Description=ydotool daemon (root)
+Documentation=man:ydotoold(8)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ydotoold
+ExecStartPost=/bin/sh -c 'for i in $(seq 1 20); do [ -S /tmp/.ydotool_socket ] && break; sleep 0.1; done; chmod 0666 /tmp/.ydotool_socket || true'
+Restart=on-failure
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

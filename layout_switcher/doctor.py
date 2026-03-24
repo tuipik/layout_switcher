@@ -87,10 +87,19 @@ def _check_uinput() -> CheckResult:
 
 
 def _check_ydotool_socket() -> CheckResult:
-    socket_path = Path(os.environ.get("YDTOOL_SOCKET", f"/run/user/{os.getuid()}/.ydotool_socket"))
-    ok = socket_path.exists()
-    detail = str(socket_path) if ok else f"{socket_path} missing"
-    return CheckResult("ydotool socket", ok, detail)
+    configured = Path(os.environ.get("YDTOOL_SOCKET", f"/run/user/{os.getuid()}/.ydotool_socket"))
+    candidates = [configured]
+    tmp_socket = Path("/tmp/.ydotool_socket")
+    if tmp_socket not in candidates:
+        candidates.append(tmp_socket)
+
+    for socket_path in candidates:
+        if socket_path.exists():
+            detail = str(socket_path)
+            if socket_path != configured:
+                detail += f" (fallback; YDTOOL_SOCKET is {configured})"
+            return CheckResult("ydotool socket", True, detail)
+    return CheckResult("ydotool socket", False, f"{configured} missing")
 
 
 def _check_keyd_virtual_keyboard() -> CheckResult:
