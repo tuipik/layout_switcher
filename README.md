@@ -49,6 +49,11 @@ Remove the user installation:
 ./scripts/uninstall_user.sh
 ```
 
+Reset all user-side state before a clean reinstall:
+```bash
+./scripts/reset_user_state.sh
+```
+
 Quick bootstrap:
 ```bash
 ./scripts/bootstrap.sh
@@ -239,6 +244,7 @@ After setup:
 - For automatic distro detection, run `./scripts/bootstrap.sh`.
 - For distro-specific bootstrap, run `./scripts/bootstrap_arch.sh` or `./scripts/bootstrap_ubuntu.sh`.
 - To remove the user installation, run `./scripts/uninstall_user.sh`.
+- To wipe user-side state before a clean reinstall, run `./scripts/reset_user_state.sh`.
 - The install scripts also create `~/.local/bin/layout-switcher` as a convenience wrapper.
 - If `layout-switcher` is not found in `zsh`, run `source ~/.zshrc` or log in again so `~/.local/bin` is picked up.
 - To check the current machine state, run `layout-switcher doctor`.

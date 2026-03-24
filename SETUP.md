@@ -156,6 +156,11 @@ To remove the user-side installation later:
 ./scripts/uninstall_user.sh
 ```
 
+To wipe everything user-side before a fresh reinstall:
+```bash
+./scripts/reset_user_state.sh
+```
+
 ## Troubleshooting
 ### `ydotool` socket errors
 If you see socket connection errors:
