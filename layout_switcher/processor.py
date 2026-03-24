@@ -170,6 +170,7 @@ class Processor:
     def _capture_selected_text(self, label: str) -> Optional[tuple[str, str]]:
         copy_combo = self._config.executor.clipboard_copy_combo
         paste_combo = self._config.executor.clipboard_paste_combo
+        previous_primary = self._executor.get_primary_selection()
         sentinel = f"__layout_switcher_copy_probe__:{uuid.uuid4()}__"
         if not self._executor.set_clipboard(sentinel):
             logger.error("Clipboard write failed; cannot prepare %s capture", label)
@@ -183,7 +184,19 @@ class Processor:
             selected_text = self._executor.get_clipboard()
             if selected_text and selected_text != sentinel:
                 return selected_text, paste_combo
+            primary_selection = self._executor.get_primary_selection()
+            if (
+                primary_selection
+                and primary_selection != previous_primary
+                and primary_selection != sentinel
+            ):
+                logger.debug("Using primary selection update for %s", label)
+                return primary_selection, paste_combo
             time.sleep(poll_ms / 1000)
+        primary_selection = self._executor.get_primary_selection()
+        if primary_selection:
+            logger.debug("Using primary selection fallback for %s", label)
+            return primary_selection, paste_combo
         logger.debug("No %s text captured from clipboard via %s", label, copy_combo)
         return None
 

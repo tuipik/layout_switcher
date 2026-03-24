@@ -60,6 +60,16 @@ class Executor:
             return None
         return result.stdout
 
+    def get_primary_selection(self) -> Optional[str]:
+        if not self._check_binary(self._cfg.wl_paste):
+            logger.error("wl-paste not found in PATH")
+            return None
+        cmd = [self._cfg.wl_paste, "--primary", "--no-newline"]
+        result = self._run(cmd, "wl-paste --primary", capture_output=True)
+        if result is None:
+            return None
+        return result.stdout
+
     def set_clipboard(self, text: str) -> bool:
         if not self._check_binary(self._cfg.wl_copy):
             logger.error("wl-copy not found in PATH")
