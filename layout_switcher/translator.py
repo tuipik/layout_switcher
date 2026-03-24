@@ -71,8 +71,16 @@ class Translator:
         primary_to_secondary = EN_TO_UK if self.primary == "en" else UK_TO_EN
         secondary_to_primary = UK_TO_EN if self.primary == "en" else EN_TO_UK
 
-        count_primary = sum(1 for ch in text if ch in primary_to_secondary)
-        count_secondary = sum(1 for ch in text if ch in secondary_to_primary)
+        count_primary = sum(
+            1
+            for ch in text
+            if ch in primary_to_secondary and primary_to_secondary[ch] != ch
+        )
+        count_secondary = sum(
+            1
+            for ch in text
+            if ch in secondary_to_primary and secondary_to_primary[ch] != ch
+        )
 
         if count_secondary > count_primary:
             return TranslationDirection(source=self.secondary, target=self.primary)
